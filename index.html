@@ -217,5 +217,27 @@
 
 <div class="toast" id="toast">Karta raqami nusxalandi ✓</div>
 
+  <!-- ===== View Counter Widget ===== -->
+  <div class="view-badge">
+    👀 Ko'rishlar: <span id="view-count">...</span>
+  </div>
+
+  <script>
+    // Render'ga yuklagan backend havolangizni shu yerga yozasiz (oxirida / bo'lmasin)
+    const BACKEND_URL = 'https://SIZNING-RENDER-LINKINGIZ.onrender.com';
+
+    fetch(`${BACKEND_URL}/api/view`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('view-count').innerText = `${data.count} - odam`;
+    })
+    .catch(err => {
+        console.error('Xatolik:', err);
+        document.getElementById('view-count').innerText = '0';
+    });
+  </script>
+
 </body>
 </html>
