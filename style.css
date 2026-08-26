@@ -697,4 +697,29 @@ svg {
   display: block;
 }
 
+/* ===== View Counter Widget Style ===== */
+.view-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 99;
+  font-family: 'Inter', sans-serif;
+}
+
+.view-badge span {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--dark);
+}
 
