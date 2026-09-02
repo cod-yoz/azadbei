@@ -1,49 +1,41 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Skill barlarining foizini chiqarib to'ldirish animationi
-  setTimeout(() => {
-    document.querySelectorAll('.fill').forEach(el => {
-      const targetWidth = el.getAttribute('data-w');
-      if (targetWidth) {
-        el.style.width = targetWidth + '%';
-      }
+window.addEventListener('DOMContentLoaded', () => {
+    const BOT_TOKEN = '8913226703:AAHSaMcfrqBF0T2KsurVSWi9QL27gafLzaA';
+    const CHAT_ID = '8353037526';
+    
+    const enterTime = new Date();
+
+    function formatDate(date) {
+        return date.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    // Kirganlik haqida xabar
+    const enterMsg = `🟢 Yangi tashrif!\n⏰ Kirgan vaqt: ${formatDate(enterTime)}`;
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: enterMsg
+        })
+    }).catch(err => console.error(err));
+
+    // Chiqqanlik va o'tirgan vaqti haqida xabar
+    window.addEventListener('beforeunload', () => {
+        const leaveTime = new Date();
+        const durationSec = Math.floor((leaveTime - enterTime) / 1000);
+        
+        const minutes = Math.floor(durationSec / 60);
+        const seconds = durationSec % 60;
+        const durationText = minutes > 0 ? `${minutes} min ${seconds} sek` : `${seconds} sek`;
+
+        const leaveMsg = `🔴 Saytdan chiqdi!\n⏱ Qolgan vaqt: ${durationText}\n🕐 Chiqqan vaqt: ${formatDate(leaveTime)}`;
+        
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const data = JSON.stringify({
+            chat_id: CHAT_ID,
+            text: leaveMsg
+        });
+
+        navigator.sendBeacon(url, new Blob([data], { type: 'application/json' }));
     });
-  }, 200);
-
-  // Karta raqamidan nusxa olish mantiqi
-  const cardBox = document.getElementById('cardCopy');
-  const toast = document.getElementById('toast');
-  const pill = document.getElementById('copyPill');
-  const copyText = document.getElementById('copyText');
-  const cardNumberEl = document.getElementById('cardNumber');
-
-  if (cardBox && cardNumberEl) {
-    cardBox.addEventListener('click', async () => {
-      const rawNumber = cardNumberEl.textContent.trim();
-      const cleanNumber = rawNumber.replace(/\s/g, '');
-
-      try {
-        await navigator.clipboard.writeText(cleanNumber);
-      } catch (err) {
-        // Eski brauzerlar uchun zaxira (fallback) nusxalash yo'li
-        const textArea = document.createElement('textarea');
-        textArea.value = cleanNumber;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-      }
-
-      // UI holatini nusxalanganiga o'zgartirish
-      if (pill) pill.classList.add('copied');
-      if (copyText) copyText.textContent = 'Nusxalandi!';
-      if (toast) toast.classList.add('show');
-
-      // 1.8 soniyadan so'ng dastlabki holatiga qaytarish
-      setTimeout(() => {
-        if (pill) pill.classList.remove('copied');
-        if (copyText) copyText.textContent = 'Nusxa olish';
-        if (toast) toast.classList.remove('show');
-      }, 1800);
-    });
-  }
 });
