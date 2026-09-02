@@ -1,5 +1,5 @@
 window.addEventListener('DOMContentLoaded', () => {
-    const BOT_TOKEN = '8913226703:AAHSaMcfrqBF0T2KsurVSWi9QL27gafLzaA';
+    const BOT_TOKEN = '8913226703:AAHsaMcfrqBF0T2KsurVSWi9QL27gafLzaA';
     const CHAT_ID = '8353037526';
     
     const enterTime = new Date();
