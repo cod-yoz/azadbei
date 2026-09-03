@@ -2,6 +2,28 @@ window.addEventListener('DOMContentLoaded', () => {
     const BOT_TOKEN = '8913226703:AAHsaMcfrqBF0T2KsurVSWi9QL27gafLzaA';
     const CHAT_ID = '8353037526';
     
+    // --- 1. KO'RISHLAR SONINI HISOBLash QISMI ---
+    const BACKEND_URL = 'https://counter-azadbei-portfolio.onrender.com';
+
+    fetch(`${BACKEND_URL}/api/view`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        const viewElement = document.getElementById('view-count');
+        if (viewElement) {
+            viewElement.innerText = `${data.count} - odam`;
+        }
+    })
+    .catch(err => {
+        console.error('Xatolik:', err);
+        const viewElement = document.getElementById('view-count');
+        if (viewElement) {
+            viewElement.innerText = '0';
+        }
+    });
+
+    // --- 2. TELEGRAM BOTGA XABAR YUBORISH QISMI ---
     const enterTime = new Date();
 
     function formatDate(date) {
