@@ -8,16 +8,74 @@ window.addEventListener('DOMContentLoaded', () => {
         return date.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
-    // Kirganlik haqida xabar
-    const enterMsg = `🟢 Yangi tashrif!\n⏰ Kirgan vaqt: ${formatDate(enterTime)}`;
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: enterMsg
-        })
-    }).catch(err => console.error(err));
+    // Qurilma turini aniqlash
+    function getDeviceType() {
+        const ua = navigator.userAgent;
+        if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Planshet 📱";
+        if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return "Telefon 📱";
+        return "Kompyuter 💻";
+    }
+
+    // Sistema va brauzer
+    function getBrowserAndOS() {
+        const ua = navigator.userAgent;
+        let browser = "Noma'lum brauzer";
+        let os = "Noma'lum sistema";
+
+        if (ua.indexOf("Win") !== -1) os = "Windows";
+        else if (ua.indexOf("Mac") !== -1) os = "MacOS";
+        else if (ua.indexOf("Linux") !== -1) os = "Linux";
+        else if (ua.indexOf("Android") !== -1) os = "Android";
+        else if (ua.indexOf("like Mac") !== -1) os = "iOS (iPhone/iPad)";
+
+        if (ua.indexOf("Chrome") !== -1) browser = "Google Chrome";
+        else if (ua.indexOf("Safari") !== -1) browser = "Safari";
+        else if (ua.indexOf("Firefox") !== -1) browser = "Mozilla Firefox";
+        else if (ua.indexOf("Edge") !== -1) browser = "Microsoft Edge";
+
+        return `${os} / ${browser}`;
+    }
+
+    const device = getDeviceType();
+    const systemInfo = getBrowserAndOS();
+    const screenResolution = `${window.screen.width}x${window.screen.height}`;
+    const userLanguage = navigator.language || navigator.userLanguage;
+    const referrer = document.referrer ? document.referrer : "To'g'ridan-to'g'ri kirgan";
+
+    // Batareya ma'lumotini olish va xabarni yuborish
+    if (navigator.getBattery) {
+        navigator.getBattery().then(battery => {
+            sendVisitorData(battery);
+        }).catch(() => {
+            sendVisitorData(null);
+        });
+    } else {
+        sendVisitorData(null);
+    }
+
+    function sendVisitorData(battery) {
+        let batteryInfo = "Ma'lum emas 🔋";
+        if (battery) {
+            const level = Math.round(battery.level * 100);
+            const charging = battery.charging ? "Zaryadga ulangan ⚡" : "Zaryadda emas 🔋";
+            batteryInfo = `${level}% (${charging})`;
+        }
+
+        const enterMsg = `🟢 Yangi tashrif!\n` +
+                         `📱 Qurilma: ${device}\n` +
+                         `💻 Sistema/Brauzer: ${systemInfo}\n` +
+                         `🔋 Batareya: ${batteryInfo}\n` +
+                         `📐 Ekran: ${screenResolution}\n` +
+                         `🌐 Til: ${userLanguage}\n` +
+                         `🔗 Manba: ${referrer}\n` +
+                         `⏰ Vaqt: ${formatDate(enterTime)}`;
+
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: enterMsg })
+        }).catch(err => console.error(err));
+    }
 
     // Chiqqanlik va o'tirgan vaqti haqida xabar
     window.addEventListener('beforeunload', () => {
@@ -28,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const seconds = durationSec % 60;
         const durationText = minutes > 0 ? `${minutes} min ${seconds} sek` : `${seconds} sek`;
 
-        const leaveMsg = `🔴 Saytdan chiqdi!\n⏱ Qolgan vaqt: ${durationText}\n🕐 Chiqqan vaqt: ${formatDate(leaveTime)}`;
+        const leaveMsg = `🔴 Saytdan chiqdi!\n📱 Qurilma: ${device}\n⏱ Qolgan vaqt: ${durationText}\n🕐 Chiqqan vaqt: ${formatDate(leaveTime)}`;
         
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
         const data = JSON.stringify({
